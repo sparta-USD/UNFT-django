@@ -19,3 +19,9 @@ class DealSerializer(serializers.ModelSerializer):
             'updated_at'
             ]
         write_only_fields = ['from_user']
+
+class DealUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deal
+        fields = ['status']
+        write_only_fields = ['status']
