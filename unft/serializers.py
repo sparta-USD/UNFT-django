@@ -21,3 +21,13 @@ class UnftCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Unft
         fields = "__all__"
+
+class UnftUpdateAllSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Unft
+        fields = ['title','desc','status','price'] 
+
+class UnftUpdateStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Unft
+        fields = ['status','price']        
