@@ -19,22 +19,17 @@ class UserSerializer(serializers.ModelSerializer):
         password = data['password']
         password2 = data['password2']
 
-        if data.get("username"):
-            try:
-                if User.objects.get(username=data.get("username")):
-                    raise serializers.ValidationError(
-                        detail={"username": "이미 존재하는 username입니다."}
-                    )
-            except:
-                # username의 길이가 8자가 넘을 때
-                if len(data.get("username", "")) > 8:
-                    raise serializers.ValidationError(
-                    detail={"username": "username은 8자리 이하로 설정해주세요."})
-        
+        # username의 길이가 8자가 넘을 때 예외처리
+        if len(data.get("username", "")) > 8:
+            raise serializers.ValidationError(
+            detail={"username": "username은 8자리 이하로 설정해주세요."})
+            
+        # password 생성 조건 (8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요)
         if password_input == None:
             raise serializers.ValidationError(
                 detail={"password": "비밀번호는 8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요합니다."})
-            
+        
+        # 패스워드 재확인 
         if password != password2:
             raise serializers.ValidationError(
                 detail={"password": "password가 불일치합니다! 다시 확인해주세요"}
@@ -43,6 +38,9 @@ class UserSerializer(serializers.ModelSerializer):
         return data
         
     def create(self, validated_data):
+        # password2를 validated_data에서 꺼내준 후 user를 create해야 한다!
+        password = validated_data.pop("password2", "")
+        
         user = super().create(validated_data)
         password = user.password
         user.set_password(password)
