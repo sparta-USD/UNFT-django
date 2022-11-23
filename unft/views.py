@@ -57,4 +57,15 @@ class UnftDetail(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # 3. 그외 수정 불가
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+            
+    def delete (self, request, id):
+        target_unft = self.get_object(id)
+        # request_user = request.user        # 로그인한 유저
+        request_user = get_user_model().objects.get(id=1)  # 로그인한 유저(임시 1번 유저)
+        target_deal_count = 1              # 거래내역(임시 0건)
+
+        # 거래내역 0건 & 크리에이터 & 소유자 일 경우만 삭제 가능
+        if(not target_deal_count and target_unft.creator==request_user and target_unft.owner==request_user):
+            target_unft.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
