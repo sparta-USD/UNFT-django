@@ -22,7 +22,9 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.contrib.auth import password_validation
-
+# 전송 이메일 제목 수정
+from django.http import HttpResponse
+from django.template import loader
 
 # 회원가입
 class UserView(APIView):
@@ -55,18 +57,25 @@ class LogoutView(APIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+
 # 비밀번호 초기화 메일보내기
 class UserPasswordResetView(PasswordResetView):
-    template_name = 'password_reset.html' 
+    # 전송된 이메일 내용
+    email_template_name = "password_reset_email.html"
+    # 전송될 이메일 제목 
+    subject_template_name = "password_reset_subject.txt"
+    template_name = 'password_reset.html'
     success_url = reverse_lazy('password_reset_done')
     form_class = PasswordResetForm
-    
+    context = {
+            'heading': 'Hello &lt;i&gt;my&lt;/i&gt; World!',
+        }
     def form_valid(self, form):
         if User.objects.filter(email=self.request.POST.get("email")).exists():
             return super().form_valid(form)
         else:
             return render(self.request, 'password_reset_done_fail.html')
-
+    
 # 메일 전송 여부 확인            
 class UserPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'password_reset_done.html' 

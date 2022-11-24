@@ -9,7 +9,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
-            usd=usd
+            usd=usd,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -20,7 +20,7 @@ class UserManager(BaseUserManager):
             email=email,
             username=username,
             password=password,
-            usd=usd
+            usd=usd,
         )
         user.is_admin = True
         user.save(using=self._db)
