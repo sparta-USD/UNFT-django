@@ -14,8 +14,7 @@ class UnftList(APIView):
         return Response(serializer.data)
 
     def post (self, request):
-        # request_user = request.user        # 로그인한 유저
-        request_user = get_user_model().objects.get(id=1)  # 로그인한 유저(임시 1번 유저)
+        request_user = request.user        # 로그인한 유저
         request.data.update({'creator': request_user.id, 'owner': request_user.id})
         serializer = UnftCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -37,8 +36,7 @@ class UnftDetail(APIView):
 
     def put (self, request, id):
         target_unft = self.get_object(id)
-        # request_user = request.user        # 로그인한 유저
-        request_user = get_user_model().objects.get(id=1)  # 로그인한 유저(임시 1번 유저)
+        request_user = request.user        # 로그인한 유저
         target_deal_count = 1              # 거래내역(임시 0건)
 
         # 1. 거래내역 0건 & 크리에이터 & 소유자 일 경우만 [제목,설명,판매상태,판매가] 수정 가능
@@ -60,8 +58,7 @@ class UnftDetail(APIView):
             
     def delete (self, request, id):
         target_unft = self.get_object(id)
-        # request_user = request.user        # 로그인한 유저
-        request_user = get_user_model().objects.get(id=1)  # 로그인한 유저(임시 1번 유저)
+        request_user = request.user        # 로그인한 유저
         target_deal_count = 1              # 거래내역(임시 0건)
 
         # 거래내역 0건 & 크리에이터 & 소유자 일 경우만 삭제 가능
