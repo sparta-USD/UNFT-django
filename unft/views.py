@@ -11,7 +11,7 @@ class UnftList(APIView):
     def get (self, request):
         all_unft = Unft.objects.all().order_by('-created_at')
         serializer = UnftSerializer(all_unft, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post (self, request):
         request_user = request.user        # 로그인한 유저
@@ -37,24 +37,24 @@ class UnftDetail(APIView):
     def put (self, request, id):
         target_unft = self.get_object(id)
         request_user = request.user        # 로그인한 유저
-        target_deal_count = 1              # 거래내역(임시 0건)
+        target_deal_count = 0              # 거래내역(임시 0건)
 
         # 1. 거래내역 0건 & 크리에이터 & 소유자 일 경우만 [제목,설명,판매상태,판매가] 수정 가능
         if(not target_deal_count and target_unft.creator==request_user and target_unft.owner==request_user):
             serializer = UnftUpdateAllSerializer(target_unft, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # 2. 소유자 일 경우만 [판매상태,판매가] 수정 가능
         elif(target_unft.owner==request_user):
             serializer = UnftUpdateStatusSerializer(target_unft, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # 3. 그외 수정 불가
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"접근 권한이 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
             
     def delete (self, request, id):
         target_unft = self.get_object(id)
@@ -64,5 +64,5 @@ class UnftDetail(APIView):
         # 거래내역 0건 & 크리에이터 & 소유자 일 경우만 삭제 가능
         if(not target_deal_count and target_unft.creator==request_user and target_unft.owner==request_user):
             target_unft.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message":"성공적으로 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message":"접근 권한이 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
