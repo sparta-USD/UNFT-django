@@ -24,9 +24,52 @@ class DealView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request):
-        deals = Deal.objects.exclude(status=0)
-        serializer = DealSerializer(deals, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # 서비스 전체 거래내역 조회
+        if not request.GET:
+            deals = Deal.objects.exclude(status=0)
+            serializer = DealSerializer(deals, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        # 특정 작품 전체 거래내역 조회
+        if "unft" in request.GET:
+            unft_id = request.GET["unft"]
+            specific_unft_deals = Deal.objects.filter(Q(unft=unft_id) & ~Q(status=0))
+            if not specific_unft_deals:
+                return Response({"message":"거래/제안 내역이 없습니다."}, status=status.HTTP_204_NO_CONTENT)
+            serializer = DealSerializer(specific_unft_deals, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        # 내 거래내역 조회
+        if ("from_user" and "to_user" in request.GET) and (len(request.GET) == 2):
+            from_user_is_me = request.GET["from_user"]
+            to_user_is_me = request.GET["to_user"]
+            specific_my_deals = Deal.objects.filter(
+                                                    (Q(from_user=from_user_is_me)|Q(to_user=to_user_is_me))
+                                                    & Q(status=1)
+                                                    )
+            if not specific_my_deals:
+                return Response({"message":"내 거래내역이 없습니다."}, status=status.HTTP_204_NO_CONTENT)
+            serializer = DealSerializer(specific_my_deals, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        # 내가 받은 제안내역 조회
+        if "from_user" in request.GET:
+            from_user_is_me = request.GET["from_user"]
+            specific_my_offerd = Deal.objects.filter(Q(from_user=from_user_is_me & Q(status=3)))
+            if not specific_my_offerd:
+                return Response({"message":"받은 제안내역이 없습니다."}, status=status.HTTP_204_NO_CONTENT)
+            serializer = DealSerializer(specific_my_offerd, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        # 내가 제안한 내역 조회
+        if "to_user" in request.GET:
+            to_user_is_me = request.GET["to_user"]
+            specific_my_offer = Deal.objects.filter(Q(to_user=to_user_is_me) & Q(status=3))
+            if not specific_my_offer:
+                return Response({"message":"제안한 내역이 없습니다."}, status=status.HTTP_204_NO_CONTENT)
+            serializer = DealSerializer(specific_my_offer, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class DealDetailView(APIView):
     def get(self, request, id):
