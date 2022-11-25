@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -73,6 +74,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -190,8 +192,8 @@ STATIC_URL = "/users/static/"
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
 
-# Email 전송 설정
 
+# Email 전송 설정
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # 메일을 호스트하는 서버
@@ -211,3 +213,7 @@ EMAIL_USE_TLS = True
 
 # 사이트와 관련한 자동응답을 받을 이메일 주소
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True
