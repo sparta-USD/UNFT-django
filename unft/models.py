@@ -32,6 +32,7 @@ class Unft(models.Model):
     result_image = models.ImageField(upload_to=upload_to_result, max_length=255, null=True)
     title = models.CharField(max_length=100)
     desc = models.TextField()
+    hits = models.IntegerField(default=0)
     creator = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="create_unft")
     owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="own_unft")
     status = models.BooleanField(default=False)
