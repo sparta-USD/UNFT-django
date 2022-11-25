@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
-from users.serializers import UserSerializer, CustomTokenObtainPairSerializer, LogoutSerializer
+from users.serializers import UserSerializer, CustomTokenObtainPairSerializer, LogoutSerializer, ProfileSerializer
 
 from users.models import User
 from rest_framework_simplejwt.views import (
@@ -135,4 +135,9 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
 # 비밀번호 재설정 완료
 class UserPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = "password_reset_complete.html"
-    
+
+class ProfileView(APIView):
+    def get(self, request, username):
+        profile = get_object_or_404(User, username=username)
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)

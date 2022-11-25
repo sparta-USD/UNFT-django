@@ -116,3 +116,4 @@ class UnftDetail(APIView):
             target_unft.delete()
             return Response({"message":"성공적으로 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
         return Response({"message":"접근 권한이 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+    
