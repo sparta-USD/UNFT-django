@@ -21,9 +21,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=rc%__8v_u(g4ku4s4p&!l%1r)nzd_$afba6qqgl=%yf_nk&60'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# secrets.json 분리 위한 작업
+import os, json
+from django.core.exceptions import ImproperlyConfigured
+
+secret_file = os.path.join(BASE_DIR, 'secrets.json')
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+SECRET_KEY = get_secret("SECRET_KEY")
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -39,8 +55,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework'
+    'corsheaders',
+    'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'users',
     'unft',
     'deal',
@@ -56,6 +74,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -130,6 +149,8 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'users.User'
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=720),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -166,7 +187,33 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_ROOT = BASE_DIR / "static"
-STATIC_URL = "/static/"
+STATIC_URL = "/users/static/"
 
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
+
+
+# Email 전송 설정
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# 메일을 호스트하는 서버
+EMAIL_HOST = 'smtp.gmail.com'
+
+# gmail과의 통신하는 포트
+EMAIL_PORT = '587'
+
+# 발신할 이메일
+EMAIL_HOST_USER = get_secret("SECRET_EMAIL")
+
+# 발신할 메일의 비밀번호 '구글앱비밀번호'
+EMAIL_HOST_PASSWORD = get_secret("SECRET_PASSWORD")
+
+# TLS 보안 방법
+EMAIL_USE_TLS = True
+
+# 사이트와 관련한 자동응답을 받을 이메일 주소
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True
