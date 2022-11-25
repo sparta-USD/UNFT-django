@@ -4,8 +4,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 # Create your models here.
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None, usd=None):
-        if not email:
-            raise ValueError('이메일 입력은 필수입니다!')
+        if not username:
+            raise ValueError('아이디 입력은 필수입니다!')
         user = self.model(
             email=self.normalize_email(email),
             username=username,
@@ -35,8 +35,8 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     
     
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username','usd'] 
+    USERNAME_FIELD = 'username'  # 로그인하고 싶은 필드
+    REQUIRED_FIELDS = ['email','usd']  # 필수로 받고 싶은 필드
     
     objects = UserManager()
     
