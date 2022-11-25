@@ -61,15 +61,12 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 # 비밀번호 초기화 메일보내기
 class UserPasswordResetView(PasswordResetView):
     # 전송된 이메일 내용
-    email_template_name = "password_reset_email.html"
+    html_email_template_name = "password_reset_email.html"
     # 전송될 이메일 제목 
     subject_template_name = "password_reset_subject.txt"
     template_name = 'password_reset.html'
     success_url = reverse_lazy('password_reset_done')
     form_class = PasswordResetForm
-    context = {
-            'heading': 'Hello &lt;i&gt;my&lt;/i&gt; World!',
-        }
     def form_valid(self, form):
         if User.objects.filter(email=self.request.POST.get("email")).exists():
             return super().form_valid(form)
