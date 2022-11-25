@@ -6,6 +6,9 @@ from .models import Unft
 from .serializers import *
 from django.contrib.auth import get_user_model
 
+import datetime
+from django.utils import timezone
+
 # Create your views here.
 class UnftList(APIView):
     def get (self, request):
@@ -31,8 +34,35 @@ class UnftDetail(APIView):
 
     def get (self, request, id):
         target_unft = self.get_object(id)
+
+        # 당일날 밤 12시에 쿠키 초기화
+        tomorrow = datetime.datetime.replace(timezone.datetime.now(), hour=23, minute=59, second=0)
+        expires = datetime.datetime.strftime(tomorrow, "%a, %d-%b-%Y %H:%M:%S GMT")
+        
+        add_cookies = ''
+
+        # 쿠키 읽어서 hits 값이 있는 지 확인
+        if request.COOKIES.get('hits') is not None:
+            cookies = request.COOKIES.get('hits')
+            cookies_list = cookies.split('|')
+            if str(id) not in cookies_list:
+                # 쿠키 생성할 내용 : 쿠키가 있어서 기존 내용에 보고있는 id 추가
+                add_cookies = f'{cookies}|{id}'
+                # 조회수 추가
+                target_unft.hits +=1
+                target_unft.save()
+        else :
+            # 쿠키 생성할 내용 : 쿠키가 없어서 보고있는 id만 추가
+            add_cookies = id
+            # 조회수 추가
+            target_unft.hits +=1
+            target_unft.save()
+
         serializer = UnftSerializer(target_unft)
-        return Response(serializer.data)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
+        if add_cookies: # 쿠키생성 
+            response.set_cookie('hits', add_cookies, expires=expires) # 쿠키 생성
+        return response
 
     def put (self, request, id):
         target_unft = self.get_object(id)
