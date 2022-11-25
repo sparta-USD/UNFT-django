@@ -5,6 +5,8 @@ from django.http import Http404
 from .models import Unft
 from .serializers import *
 from django.contrib.auth import get_user_model
+import os
+import shutil
 
 import datetime
 from django.utils import timezone
@@ -20,8 +22,26 @@ class UnftList(APIView):
         request_user = request.user        # 로그인한 유저
         request.data.update({'creator': request_user.id, 'owner': request_user.id})
         serializer = UnftCreateSerializer(data=request.data)
+ 
         if serializer.is_valid():
             serializer.save()
+            
+            last_unft = Unft.objects.last()
+            base_image = last_unft.base_image
+            style_image = last_unft.style_image
+            
+            # style transfer 실행 명령어
+            os.system(f'python unft/cli.py media/{base_image} media/{style_image} -s 156 --initial-iterations 100')
+            
+            # 생성된 파일명 가져오기
+            os.chdir('./media/unft/result_pass')
+            result = os.listdir()[0]
+            last_unft.result_image = f'unft/result/{result}'
+            
+            last_unft.save()
+            shutil.move(result,'../result')
+            os.chdir('./../../..')
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
