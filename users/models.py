@@ -30,7 +30,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(verbose_name="email address", max_length=254, unique=True)
     username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=128)
-    usd = models.IntegerField(null=False)
+    usd = models.IntegerField(default=100000, blank=True, null=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     

@@ -14,8 +14,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields=['email', 'username', 'password','password2', 'usd']
         
     def validate(self, data):
-        correct_password = re.compile("^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$")
-        password_input = correct_password.match(data.get("password", ""))
         password = data['password']
         password2 = data['password2']
 
@@ -25,14 +23,21 @@ class UserSerializer(serializers.ModelSerializer):
             detail={"username": "username은 8자리 이하로 설정해주세요."})
             
         # password 생성 조건 (8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요)
-        if password_input == None:
+        if password == None:
             raise serializers.ValidationError(
-                detail={"password": "비밀번호는 8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요합니다."})
+                detail={"password": "비밀번호는 8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요합니다."}
+            )
         
         # 패스워드 재확인 
         if password != password2:
             raise serializers.ValidationError(
                 detail={"password": "password가 불일치합니다! 다시 확인해주세요"}
+            )
+        
+        # 패스워드 조건 불일치(정규식 표현)
+        if not re.search(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$',password):
+                raise serializers.ValidationError(
+                detail={"password": "비밀번호는 8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요합니다."}
             )
         
         return data
