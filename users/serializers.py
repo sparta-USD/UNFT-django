@@ -28,16 +28,16 @@ class UserSerializer(serializers.ModelSerializer):
                 detail={"password": "비밀번호는 8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요합니다."}
             )
         
-        # 패스워드 재확인 
-        if password != password2:
-            raise serializers.ValidationError(
-                detail={"password": "password가 불일치합니다! 다시 확인해주세요"}
-            )
-        
         # 패스워드 조건 불일치(정규식 표현)
         if not re.search(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$',password):
                 raise serializers.ValidationError(
                 detail={"password": "비밀번호는 8-20자이며 최소 하나 이상의 영문자, 숫자, 특수문자가 필요합니다."}
+            )
+                
+        # 패스워드 재확인 
+        if password != password2:
+            raise serializers.ValidationError(
+                detail={"password": "password가 불일치합니다! 다시 확인해주세요"}
             )
         
         return data
