@@ -1,8 +1,6 @@
 from django.db import models
 from unft.models import Unft
-# from users.models import User
-from django.contrib.auth.models import User
-# Create your models here.
+from users.models import User
 
 class Deal(models.Model):
     unft = models.ForeignKey(Unft, on_delete = models.CASCADE, related_name="unft_deals")
