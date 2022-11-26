@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from django.db.models import Q
+from unft.models import Unft
+from users.models import User
 
 class DealView(APIView):
     def post(self, request):
@@ -100,3 +102,27 @@ class DealDetailView(APIView):
                 serializer.save()
             return Response({"message":"삭제 되었습니다."}, status=status.HTTP_204_NO_CONTENT)
         return Response({"message":"권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+
+class DealCompleteView(APIView):
+    def put(self, request, id):
+        if not request.user.is_authenticated:
+            return Response({"message":"로그인이 필요합니다!"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        deal = get_object_or_404(Deal, id=id)
+        if deal.from_user == request.user and int(request.data["status"]) == 1:
+            serializer = DealUpdateSerializer(deal, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                unft_id = serializer.data["unft"]
+                unft = get_object_or_404(Unft, id=unft_id)
+                unft.owner = deal.to_user
+                unft.save()
+                
+                from_user = get_object_or_404(User, id=deal.from_user.id)
+                to_user = get_object_or_404(User, id=deal.to_user.id)
+                from_user.usd += deal.price
+                to_user.usd -= deal.price
+                from_user.save()
+                to_user.save()
+                return Response({"message":"거래가 완료되었습니다."}, status=status.HTTP_200_OK)
+        return Response({"message":"잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN)

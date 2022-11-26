@@ -23,5 +23,6 @@ class DealSerializer(serializers.ModelSerializer):
 class DealUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deal
-        fields = ['status']
+        fields = ['status', 'unft']
         write_only_fields = ['status']
+        read_only_fields = ['unft']
