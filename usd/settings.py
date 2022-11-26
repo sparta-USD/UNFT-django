@@ -24,21 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-# secrets.json 분리 위한 작업
-import os, json
-from django.core.exceptions import ImproperlyConfigured
-
-secret_file = os.path.join(BASE_DIR, 'secrets.json')
-
-with open(secret_file) as f:
-    secrets = json.loads(f.read())
-
-def get_secret(setting, secrets=secrets):
-    try:
-        return secrets[setting]
-    except KeyError:
-        error_msg = "Set the {} environment variable".format(setting)
-        raise ImproperlyConfigured(error_msg)
 
 SECRET_KEY = os.environ.get('SECRET_KEY','')
 DEBUG = os.environ.get('DEBUG', '0') == '1'
