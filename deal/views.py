@@ -118,11 +118,17 @@ class DealCompleteView(APIView):
                 unft.owner = deal.to_user
                 unft.save()
                 
+                unfts_deals = deal.unft.unft_deals.exclude(id=id)
+                for unfts_deal in unfts_deals:
+                    if unfts_deal.status == 3 and unfts_deal.from_user == request.user:
+                        unfts_deal.status = 0
+                        unfts_deal.save()
+                    
                 from_user = get_object_or_404(User, id=deal.from_user.id)
                 to_user = get_object_or_404(User, id=deal.to_user.id)
                 from_user.usd += deal.price
                 to_user.usd -= deal.price
                 from_user.save()
                 to_user.save()
-                return Response({"message":"거래가 완료되었습니다."}, status=status.HTTP_200_OK)
+                return Response({"message":"거래가 완료되었습니다.", "from_user_usd":f"{from_user.usd}"}, status=status.HTTP_200_OK)
         return Response({"message":"잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN)
