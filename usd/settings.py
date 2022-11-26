@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
+
 from pathlib import Path
 from datetime import timedelta
 
@@ -38,9 +40,8 @@ def get_secret(setting, secrets=secrets):
         error_msg = "Set the {} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
 
-SECRET_KEY = get_secret("SECRET_KEY")
-
-DEBUG = True
+SECRET_KEY = os.environ.get('SECRET_KEY','')
+DEBUG = os.environ.get('DEBUG', '0') == '1'
 
 ALLOWED_HOSTS = ['*']
 
@@ -104,13 +105,27 @@ WSGI_APPLICATION = 'usd.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
+POSTGRES_DB = os.environ.get('POSTGRES_DB', '')
+if POSTGRES_DB:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': POSTGRES_DB,
+            'USER': os.environ.get('POSTGRES_USER', ''),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', ''),
+            'PORT': os.environ.get('POSTGRES_PORT', ''),
+        }
     }
-}
+# 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -203,10 +218,10 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'
 
 # 발신할 이메일
-EMAIL_HOST_USER = get_secret("SECRET_EMAIL")
+EMAIL_HOST_USER = os.environ.get('SECRET_EMAIL','')
 
 # 발신할 메일의 비밀번호 '구글앱비밀번호'
-EMAIL_HOST_PASSWORD = get_secret("SECRET_PASSWORD")
+EMAIL_HOST_PASSWORD = os.environ.get('SECRET_PASSWORD','')
 
 # TLS 보안 방법
 EMAIL_USE_TLS = True
@@ -216,5 +231,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 # CORS
+CORS_ORIGIN_WHITELIST = ['http://3.35.48.247']
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
