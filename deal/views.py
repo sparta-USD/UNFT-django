@@ -12,13 +12,12 @@ class DealView(APIView):
             return Response({"message":"로그인이 필요합니다!"}, status=status.HTTP_401_UNAUTHORIZED)
         
         # 이미 제안중인 거래내역이 있는지 확인
-        isDeal = Deal.objects.filter(status=3, to_user=request.user)
+        isDeal = Deal.objects.filter(status=3, to_user=request.user, unft_id=request.data["unft"])
         if isDeal:
             return Response({"message":"이미 제안했습니다!"}, status=status.HTTP_403_FORBIDDEN)
         
         serializer = DealSerializer(data=request.data)
         if serializer.is_valid():
-            #TODO from_user_id를 body에 담아 request.data에서 꺼내올 수 있는가?
             serializer.save(to_user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -55,7 +54,7 @@ class DealView(APIView):
         # 내가 받은 제안내역 조회
         if "from_user" in request.GET:
             from_user_is_me = request.GET["from_user"]
-            specific_my_offerd = Deal.objects.filter(Q(from_user=from_user_is_me & Q(status=3))).order_by("-updated_at")
+            specific_my_offerd = Deal.objects.filter(Q(from_user=from_user_is_me) & Q(status=3)).order_by("-updated_at")
             if not specific_my_offerd:
                 return Response({"message":"받은 제안내역이 없습니다."}, status=status.HTTP_200_OK)
             serializer = DealSerializer(specific_my_offerd, many=True)
