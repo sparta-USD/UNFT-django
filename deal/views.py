@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from django.db.models import Q
 from unft.models import Unft
+from users.models import User
 
 class DealView(APIView):
     def post(self, request):
@@ -116,5 +117,12 @@ class DealCompleteView(APIView):
                 unft = get_object_or_404(Unft, id=unft_id)
                 unft.owner = deal.to_user
                 unft.save()
+                
+                from_user = get_object_or_404(User, id=deal.from_user.id)
+                to_user = get_object_or_404(User, id=deal.to_user.id)
+                from_user.usd += deal.price
+                to_user.usd -= deal.price
+                from_user.save()
+                to_user.save()
                 return Response({"message":"거래가 완료되었습니다."}, status=status.HTTP_200_OK)
         return Response({"message":"잘못된 요청입니다."}, status=status.HTTP_403_FORBIDDEN)
