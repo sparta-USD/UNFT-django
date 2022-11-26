@@ -1,10 +1,13 @@
 from rest_framework import serializers
 from .models import Unft
+from deal.models import Deal
+from deal.serializers import DealSerializer
 
 class UnftSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     owner_id = serializers.SerializerMethodField()
     creator = serializers.SerializerMethodField()
+    last_price = serializers.SerializerMethodField()
     
     def get_creator(self, obj):
         return obj.creator.username
@@ -12,7 +15,10 @@ class UnftSerializer(serializers.ModelSerializer):
         return obj.owner.username
     def get_owner_id(self, obj):
         return obj.owner.id
-
+    def get_last_price(self, obj):
+        deals = Deal.objects.filter(unft=obj, status=1).order_by("-updated_at")
+        return deals[0].price
+    
     class Meta :
         model = Unft
         fields = "__all__"
