@@ -3,12 +3,15 @@ from .models import Unft
 
 class UnftSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
+    owner_id = serializers.SerializerMethodField()
     creator = serializers.SerializerMethodField()
     
     def get_creator(self, obj):
         return obj.creator.username
     def get_owner(self, obj):
         return obj.owner.username
+    def get_owner_id(self, obj):
+        return obj.owner.id
 
     class Meta :
         model = Unft
