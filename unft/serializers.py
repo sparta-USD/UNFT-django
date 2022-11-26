@@ -17,7 +17,9 @@ class UnftSerializer(serializers.ModelSerializer):
         return obj.owner.id
     def get_last_price(self, obj):
         deals = Deal.objects.filter(unft=obj, status=1).order_by("-updated_at")
-        return deals[0].price
+        if deals:
+            return deals[0].price
+        return 0
     
     class Meta :
         model = Unft
