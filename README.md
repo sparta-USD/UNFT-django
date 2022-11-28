@@ -74,4 +74,4 @@
 ![](https://velog.velcdn.com/images/haeminchoi2/post/2a534f8d-482b-4ef0-baae-b9f0c70043cd/image.png)
 
 ## 8. 🍺 이렇게 문제 해결했어요.
-### <a href="https://github.com/sparta-USD/Na-dle/wiki/%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85">상세보기 이동!</a>
+### <a href="https://github.com/sparta-USD/UNFT-django/wiki/%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85">상세보기 이동!</a>
