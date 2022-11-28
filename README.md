@@ -37,7 +37,7 @@
     - `cd install; pip install .; cd ..`
 
 3. Media 디렉토리 생성
-    a. unft 폴더 안에 `base`, `style`, `result`, `result_pass` 디렉토리 생성
+    -  unft 폴더 안에 `base`, `style`, `result`, `result_pass` 디렉토리 생성
 
 4. secrets.json 파일 생성
    - google email app 비밀번호 확인 후 아래와 같이 내용을 추가합니다.
@@ -48,8 +48,10 @@
         "SECRET_PASSWORD":"본인의 google email SECRET_PASSWORD"
     }
     ```
+# 5. 🤗 프로젝트 시연 영상
+#### <a href="https://youtu.be/xAREZLnfl6A">USD팀 U-NFT 프로젝트 시연 영상</a>
 
-## 5. 📂 기능 명세서
+# 6. 📂 기능 명세서
 
 ![](https://velog.velcdn.com/images/haeminchoi2/post/ab3ee637-da94-4373-94b6-50b06623513f/image.png)
 ![](https://velog.velcdn.com/images/haeminchoi2/post/f2d34296-e500-410b-9d04-fec508ccc48b/image.png)![](https://velog.velcdn.com/images/haeminchoi2/post/dbcb6980-4fdf-4d68-9e26-e6ec733ad444/image.png)
